@@ -1,2 +1,4 @@
-*
-!main.py
+__pycache__
+music_app.db
+APIS REST - Flask.py
+Memoria.docx
