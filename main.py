@@ -6,7 +6,7 @@ import requests
 from base64 import b64encode
 from typing import List, Optional
 
-# COMANDO: uvicorn "APIs REST:app" --reload
+# COMANDO: uvicorn "main:app" --reload
 # URL SWAGGER: http://localhost:8000/docs
 
 #Definir la ruta
