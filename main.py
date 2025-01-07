@@ -5,18 +5,18 @@ import os
 import requests
 from base64 import b64encode
 from typing import List, Optional
-
+from dotenv import load_dotenv
 # COMANDO: uvicorn "main:app" --reload
 # URL SWAGGER: http://localhost:8000/docs
 
-#Definir la ruta
-
 app = FastAPI()
+
+load_dotenv()
 
 #Define constants
 DATABASE = os.path.join("music_app.db")
-CLIENT_ID = 'a9804201b1474dc09f7db4d22ddc74e3'
-CLIENT_SECRET = '02a4ce7d5b194f479f744f9001b87e58'
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
 def validate_with_pydantic(data, model: BaseModel):
     try:
