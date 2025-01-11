@@ -71,8 +71,8 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
 
 ## Endpoints
 
-
-### 1. Crear un usuario
+### Usuarios
+#### 1. Crear un usuario
 
 - **Método**: POST /api/users/
 - **Descripción**: Crea un nuevo usuario y lo agrega a la base de datos.
@@ -89,7 +89,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ```
 
 
-### 2. Obtener todos los usuarios
+#### 2. Obtener todos los usuarios
 
 - **Método**: GET /api/users/
 - **Descripción**: Obtiene una lista de todos los usuarios registrados.
@@ -108,7 +108,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ```
 
 
-### 3. Actualizar un usuario
+#### 3. Actualizar un usuario
 
 - **Método**: PUT /api/users/{id}
 - **Descripción**: Actualiza la información de un usuario existente.
@@ -126,7 +126,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ```
 
 
-### 4. Eliminar un usuario
+#### 4. Eliminar un usuario
 
 - **Método**: DELETE /api/users/{id}
 - **Descripción**: Elimina un usuario de la base de datos por su ID.
@@ -137,8 +137,8 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   }
   ```
 
-
-### 5. Agregar un artista favorito
+### Preferencias musicales
+#### 1. Agregar un artista favorito
 
 - **Método**: POST /api/favourites/artists/
 - **Descripción**: Agrega un artista a los favoritos de un usuario.
@@ -156,7 +156,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ```
 
 
-### 6. Eliminar un artista favorito
+#### 2. Eliminar un artista favorito
 
 - **Método**: DELETE /api/favourites/artists/
 - **Descripción**: Elimina un artista de los favoritos de un usuario.
@@ -175,7 +175,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ```
 
 
-### 7. Obtener artistas favoritos de un usuario
+#### 3. Obtener artistas favoritos de un usuario
 
 - **Método**: GET /api/favourites/artists/{id}
 - **Descripción**: Obtiene una lista de los artistas favoritos de un usuario por su ID.
@@ -190,21 +190,8 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ]
   ```
 
-
-### 8. Buscar un artista en Spotify
-
-- **Método**: GET /api/spotify/artist/{artist_name}
-- **Descripción**: Busca información de un artista en Spotify.
-- **Respuesta**:
-  ```json   
-  {
-    "name": "Pitbull",
-    "id": "0TnOYISbd1XYRBk9myaseg",
-    "uri": "spotify:artist:0TnOYISbd1XYRBk9myaseg"
-  }
-  ``` 
-
-### 9. Agregar una canción favorita
+  
+#### 4. Agregar una canción favorita
 
 - **Método**: POST /api/favourites/tracks/
 - **Descripción**: Agrega una canción a los favoritos de un usuario.
@@ -222,7 +209,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ```
 
 
-### 10. Eliminar una canción favorita
+#### 5. Eliminar una canción favorita
 
 - **Método**: DELETE /api/favourites/tracks/
 - **Descripción**: Elimina una canción de los favoritos de un usuario.
@@ -241,7 +228,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ```
 
 
-### 11. Obtener canciones favoritas de un usuario
+#### 6. Obtener canciones favoritas de un usuario
 
 - **Método**: GET /api/favourites/tracks/{id}
 - **Descripción**: Obtiene una lista de las canciones favoritas de un usuario por su ID.
@@ -263,7 +250,23 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ]
   ```
 
-### 12. Buscar una canción en Spotify por nombre
+
+### Conexión con Spotify
+#### 1. Buscar un artista en Spotify
+
+- **Método**: GET /api/spotify/artist/{artist_name}
+- **Descripción**: Busca información de un artista en Spotify.
+- **Respuesta**:
+  ```json   
+  {
+    "name": "Pitbull",
+    "id": "0TnOYISbd1XYRBk9myaseg",
+    "uri": "spotify:artist:0TnOYISbd1XYRBk9myaseg"
+  }
+  ``` 
+
+
+#### 2. Buscar una canción en Spotify por nombre
 
 - **Método**: GET /api/spotify/track/{track_name}
 - **Descripción**: Busca los nombres de los artistas posibles para esa canción ordenados por popularidad.
@@ -289,7 +292,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ]
   ```
 
-### 13. Buscar una canción en Spotify por nombre y artista
+#### 3. Buscar una canción en Spotify por nombre y artista
 
 - **Método**: GET /api/spotify/track/{track_name}/{artist_name}
 - **Descripción**: Busca los nombres de los artistas posibles para esa canción ordenados por popularidad.
@@ -314,4 +317,4 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
 
 - Para interactuar con Spotify, asegúrate de que las credenciales (CLIENT_ID y CLIENT_SECRET) sean válidas.
 - El archivo de base de datos `music_app.db` se crea automáticamente en la raíz del proyecto.
-- El endpoint `/api/get_favourites_artists/{id}` devuelve información completa sobre los artistas favoritos utilizando la API de Spotify.
+- El endpoint `/api/favourites/artists/{id}` y `/api/favourites/tracks/{id}` devuelve la información utilizando la API de Spotify.
