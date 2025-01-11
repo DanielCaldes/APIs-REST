@@ -70,25 +70,189 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
 
 ## Endpoints
 
-### Usuarios
-- **POST /api/create_user**: Crea un usuario nuevo.
-- **GET /api/users**: Recupera la lista de usuarios.
-- **PUT /api/update_user/{id}**: Actualiza los datos de un usuario.
-- **DELETE /api/delete_user/{id}**: Elimina un usuario.
 
-### Preferencias de artistas
-- **POST /api/add_favourite_artist**: Añade un artista favorito.
-- **DELETE /api/remove_favourite_artist**: Elimina un artista favorito.
-- **GET /api/get_favourites_artists/{id}**: Consulta los artistas favoritos de un usuario.
+### 1. Crear un usuario
 
-### Preferencias de pistas
-- **POST /api/add_favourite_track**: Añade una pista favorita.
-- **DELETE /api/remove_favourite_track**: Elimina una pista favorita.
-- **GET /api/get_favourites_tracks/{id}**: Consulta las pistas favoritas de un usuario.
+- **Método**: POST /api/create_user
+- **Descripción**: Crea un nuevo usuario y lo agrega a la base de datos.
+- **Cuerpo de la solicitud** (JSON):
+  ```json
+  {
+    "username": "nombre"
+  }
+- **Respuesta**:
+  ```json
+  {
+    "id": 1
+  }
+  ```
 
-### Spotify
-- **GET /api/spotify_artist/{artist_name}**: Busca un artista por nombre en Spotify.
-- **GET /api/spotify_track/{track_name}**: Busca una pista por nombre en Spotify (opcionalmente, filtra por artista).
+
+### 2. Obtener todos los usuarios
+
+- **Método**: GET /api/users
+- **Descripción**: Obtiene una lista de todos los usuarios registrados.
+- **Respuesta**:
+  ```json  
+  [
+    {
+      "id": 1,
+      "username": "nombre"
+    },
+    {
+      "id": 2,
+      "username": "otro_nombre"
+    }
+  ]
+  ```
+
+
+### 3. Actualizar un usuario
+
+- **Método**: PUT /api/update_user/{id}
+- **Descripción**: Actualiza la información de un usuario existente.
+- **Cuerpo de la solicitud** (JSON):
+  ```json  
+  {
+    "username": "nuevo_nombre"
+  }
+  ```
+- **Respuesta**:
+  ```json  
+  {
+    "message": "User updated successfully"
+  }
+  ```
+
+
+### 4. Eliminar un usuario
+
+- **Método**: DELETE /api/delete_user/{id}
+- **Descripción**: Elimina un usuario de la base de datos por su ID.
+- **Respuesta**:
+  ```json  
+  {
+    "message": "User with id {id} deleted successfully."
+  }
+  ```
+
+
+### 5. Agregar un artista favorito
+
+- **Método**: POST /api/add_favourite_artist
+- **Descripción**: Agrega un artista a los favoritos de un usuario.
+- **Cuerpo de la solicitud** (JSON):
+  ```json  
+  {
+    "user_id": 1,
+    "artist_id": "0TnOYISbd1XYRBk9myaseg"
+  }
+- Respuesta:
+  {
+    "message": "Insert successful!"
+  }
+  ```
+
+
+### 6. Eliminar un artista favorito
+
+- **Método**: DELETE /api/remove_favourite_artist
+- **Descripción**: Elimina un artista de los favoritos de un usuario.
+- **Cuerpo de la solicitud** (JSON):
+  ```json  
+  {
+    "user_id": 1,
+    "artist_id": "0TnOYISbd1XYRBk9myaseg"
+  }
+  ```
+- **Respuesta**:
+  ```json  
+  {
+    "message": "Artist preference removed!"
+  }
+  ```
+
+
+### 7. Obtener artistas favoritos de un usuario
+
+- **Método**: GET /api/get_favourites_artists/{id}
+- **Descripción**: Obtiene una lista de los artistas favoritos de un usuario por su ID.
+- **Respuesta**:
+  ```json  
+  [
+    {
+      "name": "Pitbull",
+      "id": "0TnOYISbd1XYRBk9myaseg",
+      "uri": "spotify:artist:0TnOYISbd1XYRBk9myaseg"
+    }
+  ]
+  ```
+
+
+### 8. Agregar una canción favorita
+
+- **Método**: POST /api/add_favourite_track
+- **Descripción**: Agrega una canción a los favoritos de un usuario.
+- **Cuerpo de la solicitud** (JSON):
+  ```json  
+  {
+    "user_id": 1,
+    "track_id": "11dFghVXANMlKmJXsNCbNl"
+  }
+- Respuesta:
+  {
+    "message": "Insert successful!"
+  }
+  ```
+
+
+### 9. Eliminar una canción favorita
+
+- **Método**: DELETE /api/remove_favourite_track
+- **Descripción**: Elimina una canción de los favoritos de un usuario.
+- **Cuerpo de la solicitud** (JSON):
+  ```json  
+  {
+    "user_id": 1,
+    "artist_id": "11dFghVXANMlKmJXsNCbNl"
+  }
+  ```
+- **Respuesta**:
+  ```json  
+  {
+    "message": "Track preference removed!"
+  }
+  ```
+
+
+### 10. Obtener canciones favoritas de un usuario
+
+- **Método**: GET /api/get_favourites_tracks/{id}
+- **Descripción**: Obtiene una lista de las canciones favoritas de un usuario por su ID.
+- **Respuesta**:
+  ```json  
+  [
+    {
+      "name": "Pitbull",
+      "id": "0TnOYISbd1XYRBk9myaseg",
+      "uri": "spotify:artist:0TnOYISbd1XYRBk9myaseg"
+    }
+  ]
+  ```
+
+### 11. Buscar una canción en Spotify
+
+- **Método**: GET /api/spotify_artist/{artist_name}
+- **Descripción**: Busca información de un artista en Spotify.
+- **Respuesta**:
+  ```json  
+  {
+    "name": "Pitbull",
+    "id": "0TnOYISbd1XYRBk9myaseg",
+    "uri": "spotify:artist:0TnOYISbd1XYRBk9myaseg"
+  }
+  ```
+
 
 ## Notas adicionales
 
