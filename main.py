@@ -75,10 +75,10 @@ init_favourite_tracks_db()
 # Users API
 
 # Calls
-# POST  http://127.0.0.1:8000/api/create_user    {"username":"nombre"}
-# GET   http://127.0.0.1:8000/api/users
-# UPDATE    http://127.0.0.1:8000/api/update_user/<user_id>    {"username":"nombre"}
-# DELETE    http://127.0.0.1:8000/api/delete_user/<user_id>
+# POST  http://127.0.0.1:8000/api/users/    {"username":"nombre"}
+# GET   http://127.0.0.1:8000/api/users/
+# UPDATE    http://127.0.0.1:8000/api/users/<user_id>    {"username":"nombre"}
+# DELETE    http://127.0.0.1:8000/api/users/<user_id>
 
 # Define pydantic class to valid data
 class User(BaseModel):
@@ -86,7 +86,7 @@ class User(BaseModel):
     id: Optional[int] = None
 
 # Definir las operaciones sobre los usuarios de la API
-@app.post("/api/create_user", status_code=201, tags=["Users"])
+@app.post("/api/users/", status_code=201, tags=["Users"])
 def create_user(user : User):
     """
     Create a new user.
@@ -103,7 +103,7 @@ def create_user(user : User):
     except Exception as e:
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
 
-@app.get("/api/users", response_model=List[User], tags=["Users"])
+@app.get("/api/users/", response_model=List[User], tags=["Users"])
 def get_users():
     """
     Get all users
@@ -120,7 +120,7 @@ def get_users():
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"An unexpected error occurred: {str(e)}")
 
-@app.put('/api/update_user/{id}', tags=["Users"])
+@app.put('/api/users/{id}', tags=["Users"])
 def update_user(id : int, user : User):
     """
     Update the user with the provided ID
@@ -137,7 +137,7 @@ def update_user(id : int, user : User):
     except Exception as e:
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
 
-@app.delete('/api/delete_user/{id}', tags=["Users"])
+@app.delete('/api/users/{id}', tags=["Users"])
 def delete_user(id : int):
     """
     Delete a user by their ID
@@ -159,11 +159,11 @@ def delete_user(id : int):
 # Store user mussic preferences
 
 # Calls
-# POST  http://127.0.0.1:8000/api/add_favourite_artist    {"user_id":user_id , "artist_id":artist_id}
-# DELETE  http://127.0.0.1:8000/api/remove_favourite_artist    {"user_id":user_id , "artist_id":artist_id}
+# POST  http://127.0.0.1:8000/api/favourites/artists/    {"user_id":user_id , "artist_id":artist_id}
+# DELETE  http://127.0.0.1:8000/api/favourites/artists/    {"user_id":user_id , "artist_id":artist_id}
 
-# POST  http://127.0.0.1:8000/api/add_favourite_track    {"user_id":user_id , "track_id":track_id}
-# DELETE  http://127.0.0.1:8000/api/remove_favourite_track    {"user_id":user_id , "track_id":track_id}
+# POST  http://127.0.0.1:8000/api/favourites/tracks/    {"user_id":user_id , "track_id":track_id}
+# DELETE  http://127.0.0.1:8000/api/favourites/tracks/    {"user_id":user_id , "track_id":track_id}
 
 #For testing -> Artist_id(Pitbull) : 0TnOYISbd1XYRBk9myaseg  Track_id(Cut To The Feeling) : 11dFghVXANMlKmJXsNCbNl
 
@@ -176,7 +176,7 @@ class Favourite_Track(BaseModel):
     user_id : int
     track_id : str
 
-@app.post('/api/add_favourite_artist', tags=["Favourites"])
+@app.post('/api/favourites/artists/', tags=["Favourites"])
 def add_favourite_artist(favourite_artist : Favourite_Artist):
     """
     Add a favorite artist for a user
@@ -203,7 +203,7 @@ def add_favourite_artist(favourite_artist : Favourite_Artist):
     except sqlite3.Error as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error occurred: {str(e)}")
 
-@app.delete('/api/remove_favourite_artist', tags=["Favourites"])
+@app.delete('/api/favourites/artists/', tags=["Favourites"])
 def remove_favourite_artist(favourite_artist : Favourite_Artist):
     """
     Remove an artist from a user's favorites
@@ -221,7 +221,7 @@ def remove_favourite_artist(favourite_artist : Favourite_Artist):
     except sqlite3.Error as e:
         raise HTTPException(status_code=500, detail=f"Error occurred: {str(e)}")
 
-@app.post('/api/add_favourite_track', tags=["Favourites"])
+@app.post('/api/favourites/tracks/', tags=["Favourites"])
 def add_favourite_track(favourite_track :Favourite_Track):
     """
     Add a track to a user's favorites
@@ -248,7 +248,7 @@ def add_favourite_track(favourite_track :Favourite_Track):
     except sqlite3.Error as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error occurred: {str(e)}")
 
-@app.delete('/api/remove_favourite_track', tags=["Favourites"])
+@app.delete('/api/favourites/tracks/', tags=["Favourites"])
 def remove_favourite_track(favourite_track :Favourite_Track):
     """
     Remove a song from a user's favorites
@@ -270,12 +270,12 @@ def remove_favourite_track(favourite_track :Favourite_Track):
 # Connect to Spotify
 
 # Calls
-# GET  http://127.0.0.1:8000/api/spotify_artist/<artist_name>
-# GET  http://127.0.0.1:8000/api/get_favourites_artists/<user_id>
+# GET  http://127.0.0.1:8000/api/spotify/artist/<artist_name>
+# GET  http://127.0.0.1:8000/api/favourites/artists/<user_id>
 
-# GET  http://127.0.0.1:8000/api/spotify_track/<track_name>
-# GET  http://127.0.0.1:8000/api/spotify_track/<track_name>/<artist_name>
-# GET  http://127.0.0.1:8000/api/get_favourites_tracks/<user_id>
+# GET  http://127.0.0.1:8000/api/spotify/track/<track_name>
+# GET  http://127.0.0.1:8000/api/spotify/track/<track_name>/<artist_name>
+# GET  http://127.0.0.1:8000/api/favourites/tracks/<user_id>
 
 def get_spotify_token():
     url = "https://accounts.spotify.com/api/token"
@@ -318,7 +318,7 @@ class Track(BaseModel):
     artists: List[Artist]
 
 # Artists
-@app.get('/api/spotify_artist/{artist_name}', response_model=Artist, tags=["Spotify"])
+@app.get('/api/spotify/artist/{artist_name}', response_model=Artist, tags=["Spotify"])
 def search_artist_by_name(artist_name : str):
     """
     Get the Spotify data for the artist
@@ -373,7 +373,7 @@ def search_artist_by_id(artist_id : str):
     else:
         raise HTTPException(status_code=response.status_code, detail=f"Error al obtener el artista: {response.status_code}")
 
-@app.get('/api/get_favourites_artists/{id}', response_model=List[Artist], tags=["Favourites"])
+@app.get('/api/favourites/artists/{id}', response_model=List[Artist], tags=["Favourites"])
 def get_favourites_artists(id : int):
     """
     Get the favorite artists of a user
@@ -421,8 +421,8 @@ def search_track_by_id(track_id : str):
     else:
         raise HTTPException(status_code=response.status_code, detail=f"Error en la solicitud: {response.status_code}, {response.text}")
 
-@app.get('/api/spotify_track/{track_name}', tags=["Spotify"])
-@app.get('/api/spotify_track/{track_name}/{artist_name}', response_model=Track, tags=["Spotify"])
+@app.get('/api/spotify/track/{track_name}', tags=["Spotify"])
+@app.get('/api/spotify/track/{track_name}/{artist_name}', response_model=Track, tags=["Spotify"])
 def search_track_by_name(track_name : str, artist_name : Optional[str] = ""):
     """
     Search for tracks on Spotify by track name and optional artist name.
@@ -482,7 +482,7 @@ def search_track_by_name(track_name : str, artist_name : Optional[str] = ""):
     else:
         raise HTTPException(status_code=response.status_code, detail=f"Error in the request: {response.text}")
 
-@app.get('/api/get_favourites_tracks/{id}', response_model=List[Track], tags=["Favourites"])
+@app.get('/api/favourites/tracks/{id}', response_model=List[Track], tags=["Favourites"])
 def get_favourites_tracks(id : int):
     """
     Get the favorite tracks of a user
