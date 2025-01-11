@@ -66,7 +66,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
    ```
 
 2. Accede a la documentación interactiva de la API en Swagger:
-   [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+   http://127.0.0.1:8000/docs
 
 ## Endpoints
 
