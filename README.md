@@ -1,6 +1,6 @@
 # API Music Preferences App
 
-Este proyecto es una API REST construida con **FastAPI** que permite a los usuarios gestionar sus preferencias musicales. Incluye funcionalidades para interactuar con una base de datos SQLite y conectarse a la API de Spotify.
+Este proyecto es una API REST construida con **FastAPI** que permite a los usuarios gestionar sus preferencias musicales. Incluye funcionalidades para interactuar con una base de datos **SQLite** y conectarse a la **API de Spotify**.
 
 ## Características
 
@@ -15,14 +15,15 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   - Añadir un artista a la lista de favoritos de un usuario.
   - Eliminar un artista de la lista de favoritos de un usuario.
   - Consultar artistas favoritos de un usuario.
-- **Pistas favoritas**:
-  - Añadir una pista a la lista de favoritos de un usuario.
-  - Eliminar una pista de la lista de favoritos de un usuario.
-  - Consultar pistas favoritas de un usuario.
+- **Canciones favoritas**:
+  - Añadir una canción a la lista de favoritos de un usuario.
+  - Eliminar una canción de la lista de favoritos de un usuario.
+  - Consultar canciones favoritas de un usuario.
 
 ### Conexión con Spotify
 - **Buscar artista por nombre**: Recupera datos de Spotify sobre un artista específico.
-- **Buscar pista por nombre**: Recupera datos de Spotify sobre una pista específica, con la opción de filtrar por nombre de artista.
+- **Buscar canción por nombre**: Recupera una lista de artistas de Spotify ordenados por popularidad que tengan una canción con el nombre especificado.
+- **Buscar canción por nombre y artista**: Recupera datos de Spotify sobre una canción específica.
 
 ## Configuración
 
