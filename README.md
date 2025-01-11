@@ -147,7 +147,8 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
     "user_id": 1,
     "artist_id": "0TnOYISbd1XYRBk9myaseg"
   }
-- Respuesta:
+- **Respuesta**:
+  ```json   
   {
     "message": "Insert successful!"
   }
@@ -189,7 +190,20 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ```
 
 
-### 8. Agregar una canción favorita
+### 8. Buscar un artista en Spotify
+
+- **Método**: GET /api/spotify_artist/{artist_name}
+- **Descripción**: Busca información de un artista en Spotify.
+- **Respuesta**:
+  ```json   
+  {
+    "name": "Pitbull",
+    "id": "0TnOYISbd1XYRBk9myaseg",
+    "uri": "spotify:artist:0TnOYISbd1XYRBk9myaseg"
+  }
+  ``` 
+
+### 9. Agregar una canción favorita
 
 - **Método**: POST /api/add_favourite_track
 - **Descripción**: Agrega una canción a los favoritos de un usuario.
@@ -206,7 +220,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ```
 
 
-### 9. Eliminar una canción favorita
+### 10. Eliminar una canción favorita
 
 - **Método**: DELETE /api/remove_favourite_track
 - **Descripción**: Elimina una canción de los favoritos de un usuario.
@@ -214,7 +228,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ```json  
   {
     "user_id": 1,
-    "artist_id": "11dFghVXANMlKmJXsNCbNl"
+    "track_id": "11dFghVXANMlKmJXsNCbNl"
   }
   ```
 - **Respuesta**:
@@ -225,7 +239,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ```
 
 
-### 10. Obtener canciones favoritas de un usuario
+### 11. Obtener canciones favoritas de un usuario
 
 - **Método**: GET /api/get_favourites_tracks/{id}
 - **Descripción**: Obtiene una lista de las canciones favoritas de un usuario por su ID.
@@ -233,23 +247,63 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ```json  
   [
     {
-      "name": "Pitbull",
-      "id": "0TnOYISbd1XYRBk9myaseg",
-      "uri": "spotify:artist:0TnOYISbd1XYRBk9myaseg"
+      "name": "Cut To The Feeling",
+      "id": "11dFghVXANMlKmJXsNCbNl",
+      "uri": "spotify:track:11dFghVXANMlKmJXsNCbNl",
+      "artists": [
+        {
+          "name": "Carly Rae Jepsen",
+          "id": "6sFIWsNpZYqfjUpaCgueju",
+          "uri": "spotify:artist:6sFIWsNpZYqfjUpaCgueju"
+        }
+      ]
     }
   ]
   ```
 
-### 11. Buscar una canción en Spotify
+### 12. Buscar una canción en Spotify por nombre
 
-- **Método**: GET /api/spotify_artist/{artist_name}
-- **Descripción**: Busca información de un artista en Spotify.
+- **Método**: GET /api/spotify_track/{track_name}
+- **Descripción**: Busca los nombres de los artistas posibles para esa canción ordenados por popularidad.
+- **Respuesta**:
+  ```json  
+  [
+    {
+      "artist_name": "Carly Rae Jepsen",
+      "track_popularity": 56
+    },
+    {
+      "artist_name": "Elijah Mann",
+      "track_popularity": 27
+    },
+    {
+      "artist_name": "Yawning Portal",
+      "track_popularity": 24
+    },
+    {
+      "artist_name": "Kid Froopy",
+      "track_popularity": 14
+    }
+  ]
+  ```
+
+### 13. Buscar una canción en Spotify por nombre y artista
+
+- **Método**: GET /api/spotify_track/{track_name}/{artist_name}
+- **Descripción**: Busca los nombres de los artistas posibles para esa canción ordenados por popularidad.
 - **Respuesta**:
   ```json  
   {
-    "name": "Pitbull",
-    "id": "0TnOYISbd1XYRBk9myaseg",
-    "uri": "spotify:artist:0TnOYISbd1XYRBk9myaseg"
+    "name": "Cut To The Feeling",
+    "id": "6EJiVf7U0p1BBfs0qqeb1f",
+    "uri": "spotify:track:6EJiVf7U0p1BBfs0qqeb1f",
+    "artists": [
+      {
+        "name": "Carly Rae Jepsen",
+        "id": "6sFIWsNpZYqfjUpaCgueju",
+        "uri": "spotify:artist:6sFIWsNpZYqfjUpaCgueju"
+      }
+    ]
   }
   ```
 
