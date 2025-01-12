@@ -80,7 +80,7 @@ class User(BaseModel):
     username : str
     id: Optional[int] = None
 
-# Definir las operaciones sobre los usuarios de la API
+# Define the operations for the API users
 @app.post("/api/users/", status_code=201, tags=["Users"])
 def create_user(user : User):
     """
@@ -273,36 +273,25 @@ def remove_favourite_track(favourite_track :Favourite_Track):
 # GET  http://127.0.0.1:8000/api/favourites/tracks/<user_id>
 
 def get_spotify_token():
+    #Generate the necessary data to make the request to Spotify
     url = "https://accounts.spotify.com/api/token"
-    
-    # Codificar las credenciales en base64
     credentials = b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode('utf-8')).decode('utf-8')
-    
-    # Encabezados para la solicitud
-    headers = {
-        "Authorization": f"Basic {credentials}"
-    }
-    
-    # Parámetros para la solicitud
-    data = {
-        "grant_type": "client_credentials"
-    }
-    
-    # Realizamos la solicitud para obtener el token
+    headers = { "Authorization": f"Basic {credentials}" }
+    data = { "grant_type": "client_credentials" }
+
     response = requests.post(url, headers=headers, data=data)
     
-    # Verificamos si la solicitud fue exitosa
     if response.status_code == 200:
         token_info = response.json()
         return token_info['access_token']
     else:
-        print("Error al obtener el token:", response.status_code)
+        print("Error obtaining the token:", response.status_code)
         return None
 
 access_token = get_spotify_token()
 
 def spotify_request(endpoint: str, params: Optional[dict] = None):
-    """Realiza una solicitud a la API de Spotify y maneja el token de acceso."""
+    """Make a request to the Spotify API and handle the access token."""
     url = f"https://api.spotify.com/v1/{endpoint}"
     
     global access_token
@@ -313,7 +302,7 @@ def spotify_request(endpoint: str, params: Optional[dict] = None):
     if response.status_code == 200:
         return response.json()
     elif response.status_code == 401:
-        print("El token ha caducado, obteniendo uno nuevo...")
+        print("The token has expired, obtaining a new one...")
         access_token = get_spotify_token()
         headers = { 'Authorization': f'Bearer {access_token}' }
         response = requests.get(url, headers=headers, params=params)
@@ -321,9 +310,9 @@ def spotify_request(endpoint: str, params: Optional[dict] = None):
         if response.status_code == 200:
             return response.json()
         else:
-            raise HTTPException(status_code=response.status_code, detail=f"Error en la solicitud después de refrescar el token: {response.status_code}, {response.text}")
+            raise HTTPException(status_code=response.status_code, detail=f"Error in the request after refreshing the token: {response.status_code}, {response.text}")
     else:
-        raise HTTPException(status_code=response.status_code, detail=f"Error en la solicitud: {response.status_code}, {response.text}")
+        raise HTTPException(status_code=response.status_code, detail=f"Error in the request: {response.status_code}, {response.text}")
 
 
 class Artist(BaseModel):
@@ -352,18 +341,15 @@ def search_artist_by_name(artist_name : str):
     
     data = spotify_request("search",params)
     
-    if data:
-        if data['artists']['items']:
-            artist = data['artists']['items'][0]
-            return Artist(
-                name = artist['name'],
-                id = artist['id'],
-                uri = artist['uri']
-            )
-        else:
-            raise HTTPException(status_code=404, detail="No se encontró ningún artista con ese nombre.")
-    else:
-        raise HTTPException(status_code=404, detail="No se encontró ningún artista con ese nombre.")
+    if data or 'artists' not in data or 'items' not in data['artists'] or not data['artists']['items']:
+        raise HTTPException(status_code=404, detail="No artist was found with that name.")
+    
+    artist = data['artists']['items'][0]
+    return Artist(
+        name = artist['name'],
+        id = artist['id'],
+        uri = artist['uri']
+    )
 
 def search_artist_by_id(artist_id : str):
     artist = spotify_request(f"artists/{artist_id}")
@@ -395,7 +381,7 @@ def get_favourites_artists(id : int):
             favourites_artists.append(search_artist_by_id(artist_id))
         return favourites_artists
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error inesperado: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
 # Tracks
 def search_track_by_id(track_id : str):
