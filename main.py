@@ -18,17 +18,12 @@ DATABASE = os.path.join("music_app.db")
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
-def validate_with_pydantic(data, model: BaseModel):
-    try:
-        model(**data)
-        return True
-    except ValidationError as e:
-        print(e.errors())
-        return False
+def get_db_connection():
+    return sqlite3.connect(DATABASE)   
 
 #Databases
 def init_users_db():
-    with sqlite3.connect(DATABASE) as conn:
+    with get_db_connection() as conn:
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS users (
@@ -39,7 +34,7 @@ def init_users_db():
         )
 
 def init_favourite_artist_db():
-    with sqlite3.connect(DATABASE) as conn:
+    with get_db_connection() as conn:
         conn.execute("PRAGMA foreign_keys = ON")
         conn.execute(
             """
@@ -54,7 +49,7 @@ def init_favourite_artist_db():
         )
 
 def init_favourite_tracks_db():
-    with sqlite3.connect(DATABASE) as conn:
+    with get_db_connection() as conn:
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS favourite_tracks (
@@ -92,7 +87,7 @@ def create_user(user : User):
     Create a new user.
     """
     try:
-        with sqlite3.connect(DATABASE) as conn:
+        with get_db_connection() as conn:
             cursor = conn.execute(
                 "INSERT INTO users(username) VALUES (?)", (user.username,)
             )
@@ -109,7 +104,7 @@ def get_users():
     Get all users
     """
     try:
-        with sqlite3.connect(DATABASE) as conn:
+        with get_db_connection() as conn:
             cursor = conn.execute(
                 "SELECT id, username FROM users"
             )
@@ -126,7 +121,7 @@ def update_user(id : int, user : User):
     Update the user with the provided ID
     """
     try:
-        with sqlite3.connect(DATABASE) as conn:
+        with get_db_connection() as conn:
             cursor = conn.execute(
                 "UPDATE users SET username = (?) WHERE id = (?)", (user.username,id)
             )
@@ -143,7 +138,7 @@ def delete_user(id : int):
     Delete a user by their ID
     """
     try:
-        with sqlite3.connect(DATABASE) as conn:
+        with get_db_connection() as conn:
             conn.execute("PRAGMA foreign_keys = ON")
             cursor = conn.execute(
                 "DELETE FROM users WHERE id = (?)", (id,)
@@ -182,7 +177,7 @@ def add_favourite_artist(favourite_artist : Favourite_Artist):
     Add a favorite artist for a user
     """
     try:
-        with sqlite3.connect(DATABASE) as conn:
+        with get_db_connection() as conn:
             conn.execute("PRAGMA foreign_keys = ON")
             conn.execute(
                 """
@@ -209,7 +204,7 @@ def remove_favourite_artist(favourite_artist : Favourite_Artist):
     Remove an artist from a user's favorites
     """
     try:
-        with sqlite3.connect(DATABASE) as conn:
+        with get_db_connection() as conn:
             cursor = conn.execute(
                 "DELETE FROM favourite_artists WHERE user_id = (?) AND artist_id = (?)",
                 ( favourite_artist.user_id, favourite_artist.artist_id )
@@ -227,7 +222,7 @@ def add_favourite_track(favourite_track :Favourite_Track):
     Add a track to a user's favorites
     """
     try:
-        with sqlite3.connect(DATABASE) as conn:
+        with get_db_connection() as conn:
             conn.execute("PRAGMA foreign_keys = ON")
             conn.execute(
                 """
@@ -254,7 +249,7 @@ def remove_favourite_track(favourite_track :Favourite_Track):
     Remove a song from a user's favorites
     """
     try:
-        with sqlite3.connect(DATABASE) as conn:
+        with get_db_connection() as conn:
                 cursor = conn.execute(
                     "DELETE FROM favourite_tracks WHERE user_id = (?) AND track_id = (?)",
                     ( favourite_track.user_id, favourite_track.track_id)
@@ -306,6 +301,31 @@ def get_spotify_token():
 
 access_token = get_spotify_token()
 
+def spotify_request(endpoint: str, params: Optional[dict] = None):
+    """Realiza una solicitud a la API de Spotify y maneja el token de acceso."""
+    url = f"https://api.spotify.com/v1/{endpoint}"
+    
+    global access_token
+    headers = { 'Authorization': f'Bearer {access_token}' }
+
+    response = requests.get(url, headers=headers, params=params)
+
+    if response.status_code == 200:
+        return response.json()
+    elif response.status_code == 401:
+        print("El token ha caducado, obteniendo uno nuevo...")
+        access_token = get_spotify_token()
+        headers = { 'Authorization': f'Bearer {access_token}' }
+        response = requests.get(url, headers=headers, params=params)
+        
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise HTTPException(status_code=response.status_code, detail=f"Error en la solicitud después de refrescar el token: {response.status_code}, {response.text}")
+    else:
+        raise HTTPException(status_code=response.status_code, detail=f"Error en la solicitud: {response.status_code}, {response.text}")
+
+
 class Artist(BaseModel):
     name: str
     id: str
@@ -323,24 +343,16 @@ def search_artist_by_name(artist_name : str):
     """
     Get the Spotify data for the artist
     """
-    
-    url = "https://api.spotify.com/v1/search"
-    
+
     params = {
         'q': artist_name,
         'type': 'artist',
         'limit': 1
     }
     
-    headers = {
-        'Authorization': f'Bearer {access_token}'
-    }
+    data = spotify_request("search",params)
     
-    response = requests.get(url, headers=headers, params=params)
-    
-    if response.status_code == 200:
-        data = response.json()
-        
+    if data:
         if data['artists']['items']:
             artist = data['artists']['items'][0]
             return Artist(
@@ -351,27 +363,19 @@ def search_artist_by_name(artist_name : str):
         else:
             raise HTTPException(status_code=404, detail="No se encontró ningún artista con ese nombre.")
     else:
-        raise HTTPException(status_code=response.status_code, detail=f"Error en la solicitud: {response.status_code}")
+        raise HTTPException(status_code=404, detail="No se encontró ningún artista con ese nombre.")
 
 def search_artist_by_id(artist_id : str):
+    artist = spotify_request(f"artists/{artist_id}")
     
-    url = f"https://api.spotify.com/v1/artists/{artist_id}"
-    
-    headers = {
-        'Authorization': f'Bearer {access_token}'
-    }
-    
-    response = requests.get(url, headers=headers)
-    
-    if response.status_code == 200:
-        artist = response.json()
+    if artist:
         return Artist(
             id=artist['id'],
             name=artist['name'],
             uri=artist['uri']
         )
     else:
-        raise HTTPException(status_code=response.status_code, detail=f"Error al obtener el artista: {response.status_code}")
+        raise HTTPException(status_code=404, detail="Artist not found.")
 
 @app.get('/api/favourites/artists/{id}', response_model=List[Artist], tags=["Favourites"])
 def get_favourites_artists(id : int):
@@ -380,7 +384,7 @@ def get_favourites_artists(id : int):
     """
     favourites_artists = []
     try:
-        with sqlite3.connect(DATABASE) as conn:
+        with get_db_connection() as conn:
             cursor = conn.execute(
                 "SELECT artist_id FROM favourite_artists WHERE user_id = ?",
                 (id,)
@@ -395,31 +399,23 @@ def get_favourites_artists(id : int):
 
 # Tracks
 def search_track_by_id(track_id : str):
-    url = f"https://api.spotify.com/v1/tracks/{track_id}"
-
-    headers = {
-        'Authorization': f'Bearer {access_token}'
-    }
-    response = requests.get(url, headers=headers)
-    
-    if response.status_code == 200:
-        track = response.json()
-
+    track_data = spotify_request(f"tracks/{track_id}")
+    if track_data:
         artists = [Artist(
             name=artist['name'],
             id=artist['id'],
             uri=artist['uri']
-        ) for artist in track['artists']]
+        ) for artist in track_data['artists']]
         
         track = Track(
-            name=track['name'],
-            id=track['id'],
-            uri=track['uri'],
+            name=track_data['name'],
+            id=track_data['id'],
+            uri=track_data['uri'],
             artists=artists
         )
         return track
     else:
-        raise HTTPException(status_code=response.status_code, detail=f"Error en la solicitud: {response.status_code}, {response.text}")
+        return HTTPException(status_code=404, detail="Track not found.")
 
 @app.get('/api/spotify/track/{track_name}', tags=["Spotify"])
 @app.get('/api/spotify/track/{track_name}/{artist_name}', response_model=Track, tags=["Spotify"])
@@ -428,8 +424,6 @@ def search_track_by_name(track_name : str, artist_name : Optional[str] = ""):
     Search for tracks on Spotify by track name and optional artist name.
     If no artist name is provided, it returns the top tracks sorted by popularity.
     """
-    
-    url = "https://api.spotify.com/v1/search"
     
     if artist_name:
         query = f"track:{track_name} artist:{artist_name}"
@@ -443,44 +437,36 @@ def search_track_by_name(track_name : str, artist_name : Optional[str] = ""):
         'limit': limit
     }
     
-    headers = {
-        'Authorization': f'Bearer {access_token}'
-    }
+    data = spotify_request("search", params)
     
-    response = requests.get(url, headers=headers, params=params)
-    
-    if response.status_code == 200:
-        data = response.json()
-        if data['tracks']['items']:
-            if limit == 1:
-                track = data['tracks']['items'][0]
-                return Track(
-                    name=track['name'],
-                    id=track['id'],
-                    uri=track['uri'],
-                    artists=[Artist(
-                        name=artist['name'],
-                        id=artist['id'],
-                        uri=artist['uri']) for artist in track['artists']])
-            else:
-                artists_dict = {}
-                tracks = data['tracks']['items']
-                tracks_sorted = sorted(tracks, key=lambda x: x['popularity'], reverse=True)
-                for track in tracks_sorted:
-                    for artist in track['artists']:
-                        artist_name = artist['name']
-                        track_popularity = track['popularity']
-                        if artist_name not in artists_dict or track_popularity > artists_dict[artist_name]['track_popularity']:
-                            artists_dict[artist_name] = {
-                                'artist_name': artist_name,
-                                'track_popularity': track_popularity
-                                }
-                return [{"artist_name": artist['artist_name'], "track_popularity": artist['track_popularity']}
-                        for artist in artists_dict.values()]
+    if data['tracks']['items']:
+        if limit == 1:
+            track = data['tracks']['items'][0]
+            return Track(
+                name=track['name'],
+                id=track['id'],
+                uri=track['uri'],
+                artists=[Artist(
+                    name=artist['name'],
+                    id=artist['id'],
+                    uri=artist['uri']) for artist in track['artists']])
         else:
-            raise HTTPException(status_code=404, detail="No track found with the given name.")
+            artists_dict = {}
+            tracks = data['tracks']['items']
+            tracks_sorted = sorted(tracks, key=lambda x: x['popularity'], reverse=True)
+            for track in tracks_sorted:
+                for artist in track['artists']:
+                    artist_name = artist['name']
+                    track_popularity = track['popularity']
+                    if artist_name not in artists_dict or track_popularity > artists_dict[artist_name]['track_popularity']:
+                        artists_dict[artist_name] = {
+                            'artist_name': artist_name,
+                            'track_popularity': track_popularity
+                            }
+            return [{"artist_name": artist['artist_name'], "track_popularity": artist['track_popularity']}
+                    for artist in artists_dict.values()]
     else:
-        raise HTTPException(status_code=response.status_code, detail=f"Error in the request: {response.text}")
+        raise HTTPException(status_code=404, detail="No track found with the given name.")
 
 @app.get('/api/favourites/tracks/{id}', response_model=List[Track], tags=["Favourites"])
 def get_favourites_tracks(id : int):
@@ -489,7 +475,7 @@ def get_favourites_tracks(id : int):
     """
     favourites_tracks = []
     try:
-        with sqlite3.connect(DATABASE) as conn:
+        with get_db_connection() as conn:
             cursor = conn.execute(
                 "SELECT track_id FROM favourite_tracks WHERE user_id = ?",
                 (id,)
