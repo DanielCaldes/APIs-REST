@@ -1,5 +1,4 @@
 __pycache__
+gitignore
 music_app.db
-APIS REST - Flask.py
-Memoria.docx
-*.env
+.env
