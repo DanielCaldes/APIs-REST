@@ -39,6 +39,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
    ```bash
    git clone https://github.com/DanielCaldes/APIs-REST.git
    cd APIs-REST
+   cd app
    ```
 
 2. Crea y activa el entorno virtual (ejemplo con conda):
