@@ -353,4 +353,4 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
 
 - Para interactuar con Spotify, asegúrate de que las credenciales (CLIENT_ID y CLIENT_SECRET) sean válidas.
 - El archivo de base de datos `music_app.db` se crea automáticamente en la raíz del proyecto.
-- El endpoint `/api/favourites/artists/{id}` y `/api/favourites/tracks/{id}` devuelve la información utilizando la API de Spotify.
+- El endpoint `/api/users/{user_id}/favourites/artists/` y `/api/users/{user_id}/favourites/tracks/` devuelve la información utilizando la API de Spotify.
