@@ -341,7 +341,7 @@ def search_artist_by_name(artist_name : str):
     
     data = spotify_request("search",params)
     
-    if data or 'artists' not in data or 'items' not in data['artists'] or not data['artists']['items']:
+    if not data or 'artists' not in data or 'items' not in data['artists'] or not data['artists']['items']:
         raise HTTPException(status_code=404, detail="No artist was found with that name.")
     
     artist = data['artists']['items'][0]
