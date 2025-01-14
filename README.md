@@ -287,7 +287,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
 
 - **Método**: GET
   ```url
-  /api/spotify/artist/{artist_name}
+  /api/spotify/artists/{artist_name}
   ```
 - **Descripción**: Busca información de un artista en Spotify.
 - **Respuesta**:
@@ -304,7 +304,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
 
 - **Método**: GET
   ```url
-  /api/spotify/track/{track_name}
+  /api/spotify/tracks/{track_name}
   ```
 - **Descripción**: Busca los nombres de los artistas posibles para esa canción ordenados por popularidad.
 - **Respuesta**:
@@ -333,7 +333,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
 
 - **Método**: GET
   ```url
-  /api/spotify/track/{track_name}/{artist_name}
+  /api/spotify/tracks/{track_name}/{artist_name}
   ```
 - **Descripción**: Busca los nombres de los artistas posibles para esa canción ordenados por popularidad.
 - **Respuesta**:

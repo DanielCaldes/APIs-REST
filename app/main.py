@@ -265,11 +265,11 @@ def remove_favourite_track(favourite_track :Favourite_Track):
 # Connect to Spotify
 
 # Calls
-# GET  http://127.0.0.1:8000/api/spotify/artist/<artist_name>
+# GET  http://127.0.0.1:8000/api/spotify/artists/<artist_name>
 # GET  http://127.0.0.1:8000/api/favourites/artists/<user_id>
 
-# GET  http://127.0.0.1:8000/api/spotify/track/<track_name>
-# GET  http://127.0.0.1:8000/api/spotify/track/<track_name>/<artist_name>
+# GET  http://127.0.0.1:8000/api/spotify/tracks/<track_name>
+# GET  http://127.0.0.1:8000/api/spotify/tracks/<track_name>/<artist_name>
 # GET  http://127.0.0.1:8000/api/favourites/tracks/<user_id>
 
 def get_spotify_token():
@@ -327,7 +327,7 @@ class Track(BaseModel):
     artists: List[Artist]
 
 # Artists
-@app.get('/api/spotify/artist/{artist_name}', response_model=Artist, tags=["Spotify"])
+@app.get('/api/spotify/artists/{artist_name}', response_model=Artist, tags=["Spotify"])
 def search_artist_by_name(artist_name : str):
     """
     Get the Spotify data for the artist
@@ -403,8 +403,8 @@ def search_track_by_id(track_id : str):
     else:
         return HTTPException(status_code=404, detail="Track not found.")
 
-@app.get('/api/spotify/track/{track_name}', tags=["Spotify"])
-@app.get('/api/spotify/track/{track_name}/{artist_name}', response_model=Track, tags=["Spotify"])
+@app.get('/api/spotify/tracks/{track_name}', tags=["Spotify"])
+@app.get('/api/spotify/tracks/{track_name}/{artist_name}', response_model=Track, tags=["Spotify"])
 def search_track_by_name(track_name : str, artist_name : Optional[str] = ""):
     """
     Search for tracks on Spotify by track name and optional artist name.
