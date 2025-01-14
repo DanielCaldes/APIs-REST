@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 import sqlite3
 import os
 import requests
@@ -71,15 +71,14 @@ init_favourite_tracks_db()
 # Users API
 
 # Calls
-# POST  http://127.0.0.1:8000/api/users/    {"username":"nombre"}
-# GET   http://127.0.0.1:8000/api/users/
-# UPDATE    http://127.0.0.1:8000/api/users/<user_id>    {"username":"nombre"}
+# POST      http://127.0.0.1:8000/api/users/             {"username":"nombre"}
+# GET       http://127.0.0.1:8000/api/users/
+# PUT       http://127.0.0.1:8000/api/users/<user_id>    {"username":"nombre"}
 # DELETE    http://127.0.0.1:8000/api/users/<user_id>
 
 # Define pydantic class to valid data
 class User(BaseModel):
     username : str
-    id: Optional[int] = None
 
 # Define the operations for the API users
 @app.post("/api/users/", status_code=201, tags=["Users"])
@@ -155,21 +154,19 @@ def delete_user(user_id : int):
 # Store user mussic preferences
 
 # Calls
-# POST  http://127.0.0.1:8000/api/users/<user_id>/favourites/artists/    {"artist_id":artist_id}
-# DELETE  http://127.0.0.1:8000/api/users/<user_id>/favourites/artists/    {"artist_id":artist_id}
+# POST      http://127.0.0.1:8000/api/users/<user_id>/favourites/artists/    {"spotify_artist_id":artist_id}
+# DELETE    http://127.0.0.1:8000/api/users/<user_id>/favourites/artists/    {"spotify_artist_id":artist_id}
 
-# POST  http://127.0.0.1:8000/api/users/<user_id>/favourites/tracks/    {"track_id":track_id}
-# DELETE  http://127.0.0.1:8000/api/users/<user_id>/favourites/tracks/    {"track_id":track_id}
+# POST      http://127.0.0.1:8000/api/users/<user_id>/favourites/tracks/     {"spotify_track_id":track_id}
+# DELETE    http://127.0.0.1:8000/api/users/<user_id>/favourites/tracks/     {"spotify_track_id":track_id}
 
 #For testing -> Artist_id(Pitbull) : 0TnOYISbd1XYRBk9myaseg  Track_id(Cut To The Feeling) : 11dFghVXANMlKmJXsNCbNl
 
 # Define pydantic class to valid data
 class Favourite_Artist(BaseModel):
-    user_id: Optional[int] = None
     spotify_artist_id : str
 
 class Favourite_Track(BaseModel):
-    user_id : Optional[int] = None
     spotify_track_id : str
 
 @app.post('/api/users/{user_id}/favourites/artists/', tags=["Favourites"])
