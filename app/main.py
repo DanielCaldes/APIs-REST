@@ -115,25 +115,25 @@ def get_users():
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"An unexpected error occurred: {str(e)}")
 
-@app.put('/api/users/{id}', tags=["Users"])
-def update_user(id : int, user : User):
+@app.put('/api/users/{user_id}', tags=["Users"])
+def update_user(user_id : int, user : User):
     """
     Update the user with the provided ID
     """
     try:
         with get_db_connection() as conn:
             cursor = conn.execute(
-                "UPDATE users SET username = (?) WHERE id = (?)", (user.username,id)
+                "UPDATE users SET username = (?) WHERE id = (?)", (user.username,user_id)
             )
             conn.commit()
             if cursor.rowcount == 0:
-                raise HTTPException(status_code=404, detail=f"No user with id {id} found")
+                raise HTTPException(status_code=404, detail=f"No user with id {user_id} found")
             return {"message" : "User updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
 
-@app.delete('/api/users/{id}', tags=["Users"])
-def delete_user(id : int):
+@app.delete('/api/users/{user_id}', tags=["Users"])
+def delete_user(user_id : int):
     """
     Delete a user by their ID
     """
@@ -141,12 +141,12 @@ def delete_user(id : int):
         with get_db_connection() as conn:
             conn.execute("PRAGMA foreign_keys = ON")
             cursor = conn.execute(
-                "DELETE FROM users WHERE id = (?)", (id,)
+                "DELETE FROM users WHERE id = (?)", (user_id,)
             )
             conn.commit()
             if cursor.rowcount == 0:
-                raise HTTPException(status_code=404, detail=f"User with id {id} not found.")
-            return {"message":f"User with id {id} deleted successfully."}
+                raise HTTPException(status_code=404, detail=f"User with id {user_id} not found.")
+            return {"message":f"User with id {user_id} deleted successfully."}
     except Exception as e:
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
 
@@ -165,11 +165,11 @@ def delete_user(id : int):
 # Define pydantic class to valid data
 class Favourite_Artist(BaseModel):
     user_id : int
-    artist_id : str
+    spotify_artist_id : str
 
 class Favourite_Track(BaseModel):
     user_id : int
-    track_id : str
+    spotify_track_id : str
 
 @app.post('/api/favourites/artists/', tags=["Favourites"])
 def add_favourite_artist(favourite_artist : Favourite_Artist):
@@ -186,7 +186,7 @@ def add_favourite_artist(favourite_artist : Favourite_Artist):
                 """
                 , (
                     favourite_artist.user_id,
-                    favourite_artist.artist_id
+                    favourite_artist.spotify_artist_id
                 )
             )
             conn.commit()
@@ -207,7 +207,7 @@ def remove_favourite_artist(favourite_artist : Favourite_Artist):
         with get_db_connection() as conn:
             cursor = conn.execute(
                 "DELETE FROM favourite_artists WHERE user_id = (?) AND artist_id = (?)",
-                ( favourite_artist.user_id, favourite_artist.artist_id )
+                ( favourite_artist.user_id, favourite_artist.spotify_artist_id )
             )
             conn.commit()
             if cursor.rowcount == 0:
@@ -231,7 +231,7 @@ def add_favourite_track(favourite_track :Favourite_Track):
                 """
                 , (
                     favourite_track.user_id,
-                    favourite_track.track_id
+                    favourite_track.spotify_track_id
                 )
             )
             conn.commit()
@@ -252,7 +252,7 @@ def remove_favourite_track(favourite_track :Favourite_Track):
         with get_db_connection() as conn:
                 cursor = conn.execute(
                     "DELETE FROM favourite_tracks WHERE user_id = (?) AND track_id = (?)",
-                    ( favourite_track.user_id, favourite_track.track_id)
+                    ( favourite_track.user_id, favourite_track.spotify_track_id)
                 )
                 conn.commit()
                 if cursor.rowcount == 0:
@@ -351,8 +351,8 @@ def search_artist_by_name(artist_name : str):
         uri = artist['uri']
     )
 
-def search_artist_by_id(artist_id : str):
-    artist = spotify_request(f"artists/{artist_id}")
+def search_artist_by_id(spotify_artist_id : str):
+    artist = spotify_request(f"artists/{spotify_artist_id}")
     
     if artist:
         return Artist(
@@ -363,8 +363,8 @@ def search_artist_by_id(artist_id : str):
     else:
         raise HTTPException(status_code=404, detail="Artist not found.")
 
-@app.get('/api/favourites/artists/{id}', response_model=List[Artist], tags=["Favourites"])
-def get_favourites_artists(id : int):
+@app.get('/api/favourites/artists/{user_id}', response_model=List[Artist], tags=["Favourites"])
+def get_favourites_artists(user_id : int):
     """
     Get the favorite artists of a user
     """
@@ -373,7 +373,7 @@ def get_favourites_artists(id : int):
         with get_db_connection() as conn:
             cursor = conn.execute(
                 "SELECT artist_id FROM favourite_artists WHERE user_id = ?",
-                (id,)
+                (user_id,)
             )
             favourites_artists_ids = [row[0] for row in cursor.fetchall()]
         
@@ -384,8 +384,8 @@ def get_favourites_artists(id : int):
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
 # Tracks
-def search_track_by_id(track_id : str):
-    track_data = spotify_request(f"tracks/{track_id}")
+def search_track_by_id(spotify_track_id : str):
+    track_data = spotify_request(f"tracks/{spotify_track_id}")
     if track_data:
         artists = [Artist(
             name=artist['name'],
@@ -454,8 +454,8 @@ def search_track_by_name(track_name : str, artist_name : Optional[str] = ""):
     else:
         raise HTTPException(status_code=404, detail="No track found with the given name.")
 
-@app.get('/api/favourites/tracks/{id}', response_model=List[Track], tags=["Favourites"])
-def get_favourites_tracks(id : int):
+@app.get('/api/favourites/tracks/{user_id}', response_model=List[Track], tags=["Favourites"])
+def get_favourites_tracks(user_id : int):
     """
     Get the favorite tracks of a user
     """
@@ -464,7 +464,7 @@ def get_favourites_tracks(id : int):
         with get_db_connection() as conn:
             cursor = conn.execute(
                 "SELECT track_id FROM favourite_tracks WHERE user_id = ?",
-                (id,)
+                (user_id,)
             )
             favourites_tracks_ids = [row[0] for row in cursor.fetchall()]
         

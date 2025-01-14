@@ -119,7 +119,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
 
 - **Método**: PUT
   ```url
-  /api/users/{id}
+  /api/users/{user_id}
   ```
 - **Descripción**: Actualiza la información de un usuario existente.
 - **Cuerpo de la solicitud** (JSON):
@@ -140,13 +140,13 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
 
 - **Método**: DELETE
   ```url
-  /api/users/{id}
+  /api/users/{user_id}
   ```
 - **Descripción**: Elimina un usuario de la base de datos por su ID.
 - **Respuesta**:
   ```json  
   {
-    "message": "User with id {id} deleted successfully."
+    "message": "User with id {user_id} deleted successfully."
   }
   ```
 
@@ -162,7 +162,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ```json  
   {
     "user_id": 1,
-    "artist_id": "0TnOYISbd1XYRBk9myaseg"
+    "spotify_artist_id": "0TnOYISbd1XYRBk9myaseg"
   }
 - **Respuesta**:
   ```json   
@@ -183,7 +183,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ```json  
   {
     "user_id": 1,
-    "artist_id": "0TnOYISbd1XYRBk9myaseg"
+    "spotify_artist_id": "0TnOYISbd1XYRBk9myaseg"
   }
   ```
 - **Respuesta**:
@@ -198,7 +198,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
 
 - **Método**: GET
   ```url
-  /api/favourites/artists/{id}
+  /api/favourites/artists/{user_id}
   ```
 - **Descripción**: Obtiene una lista de los artistas favoritos de un usuario por su ID.
 - **Respuesta**:
@@ -224,7 +224,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ```json  
   {
     "user_id": 1,
-    "track_id": "11dFghVXANMlKmJXsNCbNl"
+    "spotify_track_id": "11dFghVXANMlKmJXsNCbNl"
   }
 - Respuesta:
   ```json
@@ -245,7 +245,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
   ```json  
   {
     "user_id": 1,
-    "track_id": "11dFghVXANMlKmJXsNCbNl"
+    "spotify_track_id": "11dFghVXANMlKmJXsNCbNl"
   }
   ```
 - **Respuesta**:
@@ -260,7 +260,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
 
 - **Método**: GET
   ```url
-  /api/favourites/tracks/{id}
+  /api/favourites/tracks/{user_id}
   ```
 - **Descripción**: Obtiene una lista de las canciones favoritas de un usuario por su ID.
 - **Respuesta**:
