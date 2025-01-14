@@ -6,6 +6,7 @@ import requests
 from base64 import b64encode
 from typing import List, Optional
 from dotenv import load_dotenv
+
 # COMANDO: uvicorn "main:app" --reload
 # URL SWAGGER: http://localhost:8000/docs
 
@@ -168,7 +169,7 @@ class Favourite_Artist(BaseModel):
     spotify_artist_id : str
 
 class Favourite_Track(BaseModel):
-    user_id : int
+    user_id : Optional[int] = None
     spotify_track_id : str
 
 @app.post('/api/users/{user_id}/favourites/artists/', tags=["Favourites"])
