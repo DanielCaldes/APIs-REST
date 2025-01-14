@@ -155,13 +155,12 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
 
 - **Método**: POST
   ```url
-  /api/favourites/artists/
+  /api/users/{user_id}/favourites/artists/
   ```
 - **Descripción**: Agrega un artista a los favoritos de un usuario.
 - **Cuerpo de la solicitud** (JSON):
   ```json  
   {
-    "user_id": 1,
     "spotify_artist_id": "0TnOYISbd1XYRBk9myaseg"
   }
 - **Respuesta**:
@@ -176,13 +175,12 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
 
 - **Método**: DELETE
   ```url
-  /api/favourites/artists/
+  /api/users/{user_id}/favourites/artists/
   ```
 - **Descripción**: Elimina un artista de los favoritos de un usuario.
 - **Cuerpo de la solicitud** (JSON):
   ```json  
   {
-    "user_id": 1,
     "spotify_artist_id": "0TnOYISbd1XYRBk9myaseg"
   }
   ```
@@ -198,7 +196,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
 
 - **Método**: GET
   ```url
-  /api/favourites/artists/{user_id}
+  /api/users/{user_id}/favourites/artists/
   ```
 - **Descripción**: Obtiene una lista de los artistas favoritos de un usuario por su ID.
 - **Respuesta**:
@@ -217,13 +215,12 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
 
 - **Método**: POST
   ```url
-  /api/favourites/tracks/
+  /api/users/{user_id}/favourites/tracks/
   ```
 - **Descripción**: Agrega una canción a los favoritos de un usuario.
 - **Cuerpo de la solicitud** (JSON):
   ```json  
   {
-    "user_id": 1,
     "spotify_track_id": "11dFghVXANMlKmJXsNCbNl"
   }
 - Respuesta:
@@ -238,13 +235,12 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
 
 - **Método**: DELETE
   ```url
-  /api/favourites/tracks/
+  /api/users/{user_id}/favourites/tracks/
   ```
 - **Descripción**: Elimina una canción de los favoritos de un usuario.
 - **Cuerpo de la solicitud** (JSON):
   ```json  
   {
-    "user_id": 1,
     "spotify_track_id": "11dFghVXANMlKmJXsNCbNl"
   }
   ```
@@ -260,7 +256,7 @@ Este proyecto es una API REST construida con **FastAPI** que permite a los usuar
 
 - **Método**: GET
   ```url
-  /api/favourites/tracks/{user_id}
+  /api/users/{user_id}/favourites/tracks/
   ```
 - **Descripción**: Obtiene una lista de las canciones favoritas de un usuario por su ID.
 - **Respuesta**:

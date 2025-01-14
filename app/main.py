@@ -154,25 +154,25 @@ def delete_user(user_id : int):
 # Store user mussic preferences
 
 # Calls
-# POST  http://127.0.0.1:8000/api/favourites/artists/    {"user_id":user_id , "artist_id":artist_id}
-# DELETE  http://127.0.0.1:8000/api/favourites/artists/    {"user_id":user_id , "artist_id":artist_id}
+# POST  http://127.0.0.1:8000/api/users/<user_id>/favourites/artists/    {"artist_id":artist_id}
+# DELETE  http://127.0.0.1:8000/api/users/<user_id>/favourites/artists/    {"artist_id":artist_id}
 
-# POST  http://127.0.0.1:8000/api/favourites/tracks/    {"user_id":user_id , "track_id":track_id}
-# DELETE  http://127.0.0.1:8000/api/favourites/tracks/    {"user_id":user_id , "track_id":track_id}
+# POST  http://127.0.0.1:8000/api/users/<user_id>/favourites/tracks/    {"track_id":track_id}
+# DELETE  http://127.0.0.1:8000/api/users/<user_id>/favourites/tracks/    {"track_id":track_id}
 
 #For testing -> Artist_id(Pitbull) : 0TnOYISbd1XYRBk9myaseg  Track_id(Cut To The Feeling) : 11dFghVXANMlKmJXsNCbNl
 
 # Define pydantic class to valid data
 class Favourite_Artist(BaseModel):
-    user_id : int
+    user_id: Optional[int] = None
     spotify_artist_id : str
 
 class Favourite_Track(BaseModel):
     user_id : int
     spotify_track_id : str
 
-@app.post('/api/favourites/artists/', tags=["Favourites"])
-def add_favourite_artist(favourite_artist : Favourite_Artist):
+@app.post('/api/users/{user_id}/favourites/artists/', tags=["Favourites"])
+def add_favourite_artist(user_id:int, favourite_artist : Favourite_Artist):
     """
     Add a favorite artist for a user
     """
@@ -185,7 +185,7 @@ def add_favourite_artist(favourite_artist : Favourite_Artist):
                     VALUES (?, ?)
                 """
                 , (
-                    favourite_artist.user_id,
+                    user_id,
                     favourite_artist.spotify_artist_id
                 )
             )
@@ -198,8 +198,8 @@ def add_favourite_artist(favourite_artist : Favourite_Artist):
     except sqlite3.Error as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error occurred: {str(e)}")
 
-@app.delete('/api/favourites/artists/', tags=["Favourites"])
-def remove_favourite_artist(favourite_artist : Favourite_Artist):
+@app.delete('/api/users/{user_id}/favourites/artists/', tags=["Favourites"])
+def remove_favourite_artist(user_id:int, favourite_artist : Favourite_Artist):
     """
     Remove an artist from a user's favorites
     """
@@ -207,7 +207,7 @@ def remove_favourite_artist(favourite_artist : Favourite_Artist):
         with get_db_connection() as conn:
             cursor = conn.execute(
                 "DELETE FROM favourite_artists WHERE user_id = (?) AND artist_id = (?)",
-                ( favourite_artist.user_id, favourite_artist.spotify_artist_id )
+                ( user_id, favourite_artist.spotify_artist_id )
             )
             conn.commit()
             if cursor.rowcount == 0:
@@ -216,8 +216,8 @@ def remove_favourite_artist(favourite_artist : Favourite_Artist):
     except sqlite3.Error as e:
         raise HTTPException(status_code=500, detail=f"Error occurred: {str(e)}")
 
-@app.post('/api/favourites/tracks/', tags=["Favourites"])
-def add_favourite_track(favourite_track :Favourite_Track):
+@app.post('/api/users/{user_id}/favourites/tracks/', tags=["Favourites"])
+def add_favourite_track(user_id:int, favourite_track :Favourite_Track):
     """
     Add a track to a user's favorites
     """
@@ -230,7 +230,7 @@ def add_favourite_track(favourite_track :Favourite_Track):
                     VALUES (?, ?)
                 """
                 , (
-                    favourite_track.user_id,
+                    user_id,
                     favourite_track.spotify_track_id
                 )
             )
@@ -243,8 +243,8 @@ def add_favourite_track(favourite_track :Favourite_Track):
     except sqlite3.Error as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error occurred: {str(e)}")
 
-@app.delete('/api/favourites/tracks/', tags=["Favourites"])
-def remove_favourite_track(favourite_track :Favourite_Track):
+@app.delete('/api/users/{user_id}/favourites/tracks/', tags=["Favourites"])
+def remove_favourite_track(user_id:int, favourite_track :Favourite_Track):
     """
     Remove a song from a user's favorites
     """
@@ -252,7 +252,7 @@ def remove_favourite_track(favourite_track :Favourite_Track):
         with get_db_connection() as conn:
                 cursor = conn.execute(
                     "DELETE FROM favourite_tracks WHERE user_id = (?) AND track_id = (?)",
-                    ( favourite_track.user_id, favourite_track.spotify_track_id)
+                    ( user_id, favourite_track.spotify_track_id)
                 )
                 conn.commit()
                 if cursor.rowcount == 0:
@@ -266,11 +266,11 @@ def remove_favourite_track(favourite_track :Favourite_Track):
 
 # Calls
 # GET  http://127.0.0.1:8000/api/spotify/artists/<artist_name>
-# GET  http://127.0.0.1:8000/api/favourites/artists/<user_id>
+# GET  http://127.0.0.1:8000/api/users/<user_id>/favourites/artists/<user_id>
 
 # GET  http://127.0.0.1:8000/api/spotify/tracks/<track_name>
 # GET  http://127.0.0.1:8000/api/spotify/tracks/<track_name>/<artist_name>
-# GET  http://127.0.0.1:8000/api/favourites/tracks/<user_id>
+# GET  http://127.0.0.1:8000/api/users/<user_id>favourites/tracks/<user_id>
 
 def get_spotify_token():
     #Generate the necessary data to make the request to Spotify
@@ -363,7 +363,7 @@ def search_artist_by_id(spotify_artist_id : str):
     else:
         raise HTTPException(status_code=404, detail="Artist not found.")
 
-@app.get('/api/favourites/artists/{user_id}', response_model=List[Artist], tags=["Favourites"])
+@app.get('/api/users/{user_id}/favourites/artists/', response_model=List[Artist], tags=["Favourites"])
 def get_favourites_artists(user_id : int):
     """
     Get the favorite artists of a user
@@ -454,7 +454,7 @@ def search_track_by_name(track_name : str, artist_name : Optional[str] = ""):
     else:
         raise HTTPException(status_code=404, detail="No track found with the given name.")
 
-@app.get('/api/favourites/tracks/{user_id}', response_model=List[Track], tags=["Favourites"])
+@app.get('/api/users/{user_id}/favourites/tracks/', response_model=List[Track], tags=["Favourites"])
 def get_favourites_tracks(user_id : int):
     """
     Get the favorite tracks of a user
